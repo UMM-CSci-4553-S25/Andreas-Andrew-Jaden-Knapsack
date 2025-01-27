@@ -1,0 +1,12 @@
+[package]
+name = "knapsack"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.95"
+course-helpers = { version = "0.3.2", registry = "ec-course" }
+ec-core = { version = "0.1.0-course.3", registry = "ec-course" }
+ec-linear = { version = "0.1.0-course.3", registry = "ec-course" }
+rand = "0.9.0-beta.3"
+test-case = "3.3.1"
