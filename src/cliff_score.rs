@@ -10,6 +10,15 @@ pub enum CliffScore {
     Score(u64),
 }
 
+impl CliffScore {
+    pub fn to_int(&self) -> u64 {
+        match self {
+            CliffScore::Score(val) => *val,
+            CliffScore::Overloaded => 0,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::cmp::Ordering;

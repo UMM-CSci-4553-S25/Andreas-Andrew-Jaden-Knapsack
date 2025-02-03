@@ -100,11 +100,13 @@ fn main() -> anyhow::Result<()> {
     )?;
 
     let knapsack = Knapsack::from_file_path("knapsacks/big.txt")?;
-    const NUM_RUNS: usize = 10;
-    const BASELINE_GENERATIONS: usize = 1_000;
+    const NUM_RUNS: usize = 50;
+    const BASELINE_GENERATIONS: usize = 250;
+    const GENERATION_START: usize = 10;
+    const INCREMENT_SIZE: usize = 20;
 
     // First, run the baseline experiments (1000 generations, 10 times)
-    println!("Running baseline experiments (1000 generations)...");
+    println!("Running baseline experiments ({} generations)...", BASELINE_GENERATIONS);
     for run in 0..NUM_RUNS {
         let base_seed = run as u64;
         let result = execute_single_run(BASELINE_GENERATIONS, run, &knapsack, base_seed)?;
@@ -114,7 +116,7 @@ fn main() -> anyhow::Result<()> {
             "baseline,{},{},{:?},{},{}",
             result.run_number,
             result.generation_count,
-            result.best_score,
+            result.best_score.to_int(),
             result.generation_found,
             result.run_time_ms
         )?;
@@ -123,7 +125,7 @@ fn main() -> anyhow::Result<()> {
     }
 
     // Then run the incremental experiments (100 to 900 generations, 10 times each)
-    for generations in (100..BASELINE_GENERATIONS).step_by(100) {
+    for generations in (GENERATION_START..BASELINE_GENERATIONS).step_by(INCREMENT_SIZE) {
         println!("Running experiments with {} generations...", generations);
         
         for run in 0..NUM_RUNS {
@@ -135,7 +137,7 @@ fn main() -> anyhow::Result<()> {
                 "incremental,{},{},{:?},{},{}",
                 result.run_number,
                 result.generation_count,
-                result.best_score,
+                result.best_score.to_int(),
                 result.generation_found,
                 result.run_time_ms
             )?;
