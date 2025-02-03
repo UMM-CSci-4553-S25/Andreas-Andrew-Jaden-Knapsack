@@ -105,7 +105,7 @@ fn main() -> anyhow::Result<()> {
     const GENERATION_START: usize = 10;
     const INCREMENT_SIZE: usize = 20;
 
-    // First, run the baseline experiments (1000 generations, 10 times)
+    // First, run the baseline experiments (250 generations, 50 times)
     println!("Running baseline experiments ({} generations)...", BASELINE_GENERATIONS);
     for run in 0..NUM_RUNS {
         let base_seed = run as u64;
@@ -124,7 +124,7 @@ fn main() -> anyhow::Result<()> {
         println!("Completed baseline run {} of {}", run + 1, NUM_RUNS);
     }
 
-    // Then run the incremental experiments (100 to 900 generations, 10 times each)
+    // Then run the incremental experiments (10 to 230 generations, 50 times each)
     for generations in (GENERATION_START..BASELINE_GENERATIONS).step_by(INCREMENT_SIZE) {
         println!("Running experiments with {} generations...", generations);
         
