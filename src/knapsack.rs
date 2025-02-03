@@ -14,7 +14,7 @@ use crate::item::Item;
 /// A knapsack problem is a `capacity` along with a collection `items``,
 /// each of which has a value and weight.
 // We need to derive `Debug` so we can print out instances of `Knapsack`.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Knapsack {
     /// The collection of items to choose from in this instance
     items: Vec<Item>,
