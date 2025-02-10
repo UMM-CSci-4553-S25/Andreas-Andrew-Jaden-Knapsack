@@ -1,0 +1,40 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+
+library(ggplot2)
+
+data <- read.csv("knapsack_results_250base_inc20.csv")
+filtered_data <- subset(data, !(generations %in% c(10, 30, 50, 70)))
+
+# boxplot
+ggplot(data, aes(x = as.factor(generations), y = best_score)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Best Scores by Generations",
+       x = "Generations",
+       y = "Best Score") +
+  theme_minimal()
+
+
+
+ggplot(filtered_data, aes(x = as.factor(generations), y = best_score)) +
+  geom_boxplot() +
+  labs(title = "Filtered Boxplot of Best Scores by Generations",
+       x = "Generations",
+       y = "Best Score") +
+  theme_minimal()
+
+
+wilcox_results <- pairwise.wilcox.test(data$best_score, 
+                                      as.factor(data$generations),
+                                      p.adjust.method = "bonferroni")
+print("Pairwise Wilcoxon Test Results (All Data):")
+print(wilcox_results)
+
+```
+
