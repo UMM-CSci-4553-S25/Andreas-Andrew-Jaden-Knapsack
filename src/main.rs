@@ -3,7 +3,7 @@ mod cliff_scorer;
 mod item;
 mod knapsack;
 
-use std::fs::File;
+use std::fs::OpenOptions;
 use std::io::Write;
 use rand::{SeedableRng, rngs::StdRng};
 use cliff_score::CliffScore;
@@ -93,19 +93,17 @@ fn execute_single_run(
 }
 
 fn main() -> anyhow::Result<()> {
-    let mut results_file = File::create("knapsack_results.csv")?;
-    writeln!(
-        results_file, 
-        "experiment_type,run_number,generations,best_score,generation_found,run_time_ms"
-    )?;
-
+    let mut results_file = OpenOptions::new()
+        .append(true)
+        .open("knapsack_results_250base_inc20.csv")?;
+    
     let knapsack = Knapsack::from_file_path("knapsacks/big.txt")?;
     const NUM_RUNS: usize = 50;
     const BASELINE_GENERATIONS: usize = 100;
     const GENERATION_START: usize = 5;
     const INCREMENT_SIZE: usize = 5;
 
-    // First, run the baseline experiments (250 generations, 50 times)
+    // First, run the baseline experiments (100 generations, 50 times)
     println!("Running baseline experiments ({} generations)...", BASELINE_GENERATIONS);
     for run in 0..NUM_RUNS {
         let base_seed = run as u64;
@@ -124,8 +122,8 @@ fn main() -> anyhow::Result<()> {
         println!("Completed baseline run {} of {}", run + 1, NUM_RUNS);
     }
 
-    // Then run the incremental experiments (10 to 230 generations, 50 times each)
-    for generations in (GENERATION_START..BASELINE_GENERATIONS).step_by(INCREMENT_SIZE) {
+    // Then run the incremental experiments (5 to 100 generations, 50 times each)
+    for generations in (GENERATION_START..=BASELINE_GENERATIONS).step_by(INCREMENT_SIZE) {
         println!("Running experiments with {} generations...", generations);
         
         for run in 0..NUM_RUNS {
@@ -147,6 +145,6 @@ fn main() -> anyhow::Result<()> {
         }
     }
 
-    println!("Experiment complete! Results written to knapsack_results.csv");
+    println!("Experiment complete! Results written to knapsack_results_250base_inc20.csv");
     Ok(())
 }
