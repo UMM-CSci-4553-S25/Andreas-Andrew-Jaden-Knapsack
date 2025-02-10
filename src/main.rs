@@ -101,9 +101,9 @@ fn main() -> anyhow::Result<()> {
 
     let knapsack = Knapsack::from_file_path("knapsacks/big.txt")?;
     const NUM_RUNS: usize = 50;
-    const BASELINE_GENERATIONS: usize = 250;
-    const GENERATION_START: usize = 10;
-    const INCREMENT_SIZE: usize = 20;
+    const BASELINE_GENERATIONS: usize = 100;
+    const GENERATION_START: usize = 5;
+    const INCREMENT_SIZE: usize = 5;
 
     // First, run the baseline experiments (250 generations, 50 times)
     println!("Running baseline experiments ({} generations)...", BASELINE_GENERATIONS);
