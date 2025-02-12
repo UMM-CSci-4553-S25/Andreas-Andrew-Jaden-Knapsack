@@ -4,15 +4,71 @@ output:
   html_document: default
 ---
 
+# Knapsack Problem Results
+
+## Group Members
+Andreas, Andrew, Jaden
+
+## Problem Description
+
+The knapsack problem is a classic optimization problem where you have a knapsack with a limited weight capacity, and a set of items, each with a weight and a value. The goal is to select the items to put in the knapsack to maximize the total value without exceeding the weight limit. 
+
+### Knobs to Twiddle
+
+In this experiment, we focused on adjusting the maximum number of generations to determine when we would start to experience diminishing returns in our scores.
+
+### Unchanging System Parts
+
+We kept the following aspects of the system constant:
+
+*   Scoring system: We used the cliff-scorer system provided in knapsack-ga.
+*   Mutation rate: We used the default mutation rate provided in knapsack-ga. 
+
+### Framework
+
+We used the knapsack-ga framework for our experiment.
+
+### Experimental Design
+
+We performed a series of runs across several different scopes to identify the point at which 
+
+### Values for Knobs
+
+We used the following sets of values for the maximum number of generations:
+
+*   100 to 1000 with an increment interval of 100
+*   10 to 250 with an increment interval of 20
+*   5 to 100 with an increment interval of 5
+
+### Number of Runs
+
+We performed 50 runs for each set of parameter values.
+
+### Data Collection
+
+For each run, we collected the following data:
+
+*   Run number
+*   Generation count
+*   Generation found
+*   Best score
+*   Run time
+*   Incremental
+
+## Results
+
+### Summary
+
+Our results suggest that increasing the maximum number of generations initially leads to improved scores, but beyond a certain point, the gains become statistically insignificant.
+
+### Tables and Graphs
 
 ```{r}
-
 library(ggplot2)
 library(reshape2)
 
-
 data <- read.csv("knapsack_results_250base_inc20.csv")
-filtered_data <- subset(data, !(generations %in% c(5,10,15,20,25,30,35,40,45)))
+filtered_data <- subset(data,!(generations %in% c(5,10,15,20,25,30,35,40,45)))
 
 # boxplot
 ggplot(data, aes(x = as.factor(generations), y = best_score)) +
@@ -21,8 +77,6 @@ ggplot(data, aes(x = as.factor(generations), y = best_score)) +
        x = "Generations",
        y = "Best Score") +
   theme_minimal()
-
-
 
 ggplot(filtered_data, aes(x = as.factor(generations), y = best_score)) +
   geom_boxplot() +
@@ -34,18 +88,18 @@ ggplot(filtered_data, aes(x = as.factor(generations), y = best_score)) +
 
 ```
 
+### Statistical Tests
+
+We used the Pairwise Wilcoxon test to determine the point at which the number of max generations stops returning scores with a statistically significant difference.
 
 ```{r}
-
 # p values
 
-wilcox_results <- pairwise.wilcox.test(data$best_score, 
-                                      as.factor(data$generations),
-                                      p.adjust.method = "bonferroni")
-#print("Pairwise Wilcoxon Test Results (All Data):")
-#print(wilcox_results)
-
-matrix_results <- wilcox_results$p.value 
+wilcox_results <- pairwise.wilcox.test(data$best_score,
+                                        as.factor(data$generations),
+                                        p.adjust.method = "bonferroni")
+# full results hidden here
+# print(wilcox_results)
 
 library(knitr)
 library(kableExtra)
@@ -53,14 +107,21 @@ library(kableExtra)
 # Extract Wilcoxon test results as a matrix
 matrix_results <- wilcox_results$p.value
 
+# Round the matrix_results to the nearest hundredth
+rounded_matrix <- round(matrix_results, 2)
+
 # Replace NA values with "-" for better readability
 matrix_results[is.na(matrix_results)] <- "-"
 
-# Format as a lower triangular table
-kable(matrix_results, format = "html", escape = FALSE) %>%
-  kable_styling(full_width = FALSE, font_size = 10) %>%
+
+
+kable(rounded_matrix, format = "latex", escape = FALSE) %>%
+  kable_styling(full_width = FALSE, font_size = 2) %>%
   scroll_box(width = "100%", height = "400px")
 
+# kable(matrix_results, format = "latex", escape = FALSE) %>%
+#  kable_styling(full_width = FALSE, font_size = 8) %>%
+#  scroll_box(width = "100%", height = "400px") 
 
 # Convert Wilcoxon test results into a data frame
 wilcox_matrix <- as.data.frame(as.table(wilcox_results$p.value))
@@ -76,9 +137,9 @@ wilcox_matrix$Gen1 <- as.numeric(as.character(wilcox_matrix$Gen1))
 wilcox_matrix$Gen2 <- as.numeric(as.character(wilcox_matrix$Gen2))
 
 # Create the heatmap
-ggplot(wilcox_matrix, aes(x = factor(Gen1, levels = unique(wilcox_matrix$Gen1)), 
-                          y = factor(Gen2, levels = unique(wilcox_matrix$Gen2)), 
-                          fill = -log10(P_Value))) +
+ggplot(wilcox_matrix, aes(x = factor(Gen1, levels = unique(wilcox_matrix$Gen1)),
+                           y = factor(Gen2, levels = unique(wilcox_matrix$Gen2)),
+                           fill = -log10(P_Value))) +
   geom_tile(color = "white") +
   scale_fill_gradient(low = "blue", high = "red", name = "-log10(p-value)") +
   labs(title = "Pairwise Wilcoxon Test Heatmap",
@@ -88,3 +149,12 @@ ggplot(wilcox_matrix, aes(x = factor(Gen1, levels = unique(wilcox_matrix$Gen1)),
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
 ```
 
+### Discussion
+
+Based on the boxplots, it initially appeared that 45 generations would be the optimal number due to its median score aligning with higher generation counts, but It had a much lower range compared to higher values. We see this range fall in line with higher numbers of generations around 60, but with drastically lower outliers. We don't see the outliers fall in line until 100 max generations.
+
+We verified our findings using a Pairwise Wilcoxen Test, and we discovered that 100 is indeed the point at which any further numbers of max generations provide no statistically significant difference, with any minor differences coming down to the random nature of our tests.
+
+## Conclusion
+
+In this experiment, we explored the relationship between the maximum number of generations and the best score achieved in the knapsack problem. We learned that increasing the maximum number of generations can improve the solution, but there is a point of diminishing returns. Based on our results, using a maximum of 100 generations appears to be sufficient for achieving near-optimal solutions.
