@@ -68,21 +68,17 @@ library(ggplot2)
 library(reshape2)
 
 data <- read.csv("knapsack_results_250base_inc20.csv")
-filtered_data <- subset(data,!(generations %in% c(5,10,15,20,25,30,35,40,45)))
+filtered_data <- subset(data, !(generations %in% c(5, 10, 15, 20, 25, 30, 35, 40, 45)))
 
 # boxplot
 ggplot(data, aes(x = as.factor(generations), y = best_score)) +
   geom_boxplot() +
-  labs(title = "Boxplot of Best Scores by Generations",
-       x = "Generations",
-       y = "Best Score") +
+  labs(title = "Boxplot of Best Scores by Generations", x = "Generations", y = "Best Score") +
   theme_minimal()
 
 ggplot(filtered_data, aes(x = as.factor(generations), y = best_score)) +
   geom_boxplot() +
-  labs(title = "Filtered Boxplot of Best Scores by Generations",
-       x = "Generations",
-       y = "Best Score") +
+  labs(title = "Filtered Boxplot of Best Scores by Generations", x = "Generations", y = "Best Score") +
   theme_minimal()
 
 
@@ -94,15 +90,12 @@ We used the Pairwise Wilcoxon test to determine the point at which the number of
 
 ```{r}
 # p values
-
-wilcox_results <- pairwise.wilcox.test(data$best_score,
-                                        as.factor(data$generations),
-                                        p.adjust.method = "bonferroni")
-# full results hidden here
-# print(wilcox_results)
-
 library(knitr)
 library(kableExtra)
+
+wilcox_results <- pairwise.wilcox.test(data$best_score,
+                                       as.factor(data$generations),
+                                       p.adjust.method = "bonferroni")
 
 # Extract Wilcoxon test results as a matrix
 matrix_results <- wilcox_results$p.value
@@ -112,16 +105,6 @@ rounded_matrix <- round(matrix_results, 2)
 
 # Replace NA values with "-" for better readability
 matrix_results[is.na(matrix_results)] <- "-"
-
-
-
-kable(rounded_matrix, format = "latex", escape = FALSE) %>%
-  kable_styling(full_width = FALSE, font_size = 2) %>%
-  scroll_box(width = "100%", height = "400px")
-
-# kable(matrix_results, format = "latex", escape = FALSE) %>%
-#  kable_styling(full_width = FALSE, font_size = 8) %>%
-#  scroll_box(width = "100%", height = "400px") 
 
 # Convert Wilcoxon test results into a data frame
 wilcox_matrix <- as.data.frame(as.table(wilcox_results$p.value))
@@ -137,14 +120,16 @@ wilcox_matrix$Gen1 <- as.numeric(as.character(wilcox_matrix$Gen1))
 wilcox_matrix$Gen2 <- as.numeric(as.character(wilcox_matrix$Gen2))
 
 # Create the heatmap
-ggplot(wilcox_matrix, aes(x = factor(Gen1, levels = unique(wilcox_matrix$Gen1)),
-                           y = factor(Gen2, levels = unique(wilcox_matrix$Gen2)),
-                           fill = -log10(P_Value))) +
+ggplot(wilcox_matrix, aes(
+  x = factor(Gen1, levels = unique(wilcox_matrix$Gen1)),
+  y = factor(Gen2, levels = unique(wilcox_matrix$Gen2)),
+  fill = -log10(P_Value)
+)) +
   geom_tile(color = "white") +
-  scale_fill_gradient(low = "blue", high = "red", name = "-log10(p-value)") +
-  labs(title = "Pairwise Wilcoxon Test Heatmap",
-       x = "Generations",
-       y = "Generations") +
+  scale_fill_gradient(low = "blue",
+                      high = "red",
+                      name = "-log10(p-value)") +
+  labs(title = "Pairwise Wilcoxon Test Heatmap", x = "Generations", y = "Generations") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
 ```
@@ -158,3 +143,10 @@ We verified our findings using a Pairwise Wilcoxen Test, and we discovered that 
 ## Conclusion
 
 In this experiment, we explored the relationship between the maximum number of generations and the best score achieved in the knapsack problem. We learned that increasing the maximum number of generations can improve the solution, but there is a point of diminishing returns. Based on our results, using a maximum of 100 generations appears to be sufficient for achieving near-optimal solutions.
+
+## Apendix
+
+```{r}
+print(wilcox_results)
+```
+
